@@ -23,7 +23,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat Help')),
+      appBar: AppBar(title: const Text('Chat Help'), centerTitle: true, automaticallyImplyLeading: false),
       body: Column(
         children: [
           Expanded(
