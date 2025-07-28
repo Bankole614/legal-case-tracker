@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Tenant Rights",
+    "steps": [
+      "Your landlord needs to give 30 days’ notice before eviction.",
+      "You can write a demand letter asking for reinstatement.",
+      "If ignored, file a complaint at the local magistrate’s court."
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Workplace Abuse",
+    "steps": [
+      "Your employer cannot withhold your salary without cause.",
+      "Document each incident with date and witness.",
+      "Send a written grievance to HR; if no response, report to the labour office."
+    ]
+  }
+]
