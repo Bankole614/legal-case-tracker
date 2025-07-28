@@ -26,7 +26,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late final List<Widget> _tabs = [
     DashboardPage(onNavigateToTab: _changeTab),
     ChatPage(),
-    USSDInterface(),
+    USSDDialerScreen(),
     ProfilePage(),
   ];
 
