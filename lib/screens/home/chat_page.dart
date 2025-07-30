@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
+import '../../services/ai_service.dart';
 
 class ChatPage extends ConsumerStatefulWidget {
   static const routeName = '/chat';
-
   const ChatPage({super.key});
 
   @override
@@ -14,15 +14,32 @@ class ChatPage extends ConsumerStatefulWidget {
 class _ChatPageState extends ConsumerState<ChatPage> {
   final TextEditingController _controller = TextEditingController();
   final List<_Message> _messages = [];
+  bool _isLoading = false;
+  final AIService _aiService = AIService();
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
       _messages.add(_Message(text: text, isUser: true));
-      _messages.add(_Message(text: '(stubbed response)', isUser: false));
-      _controller.clear();
+      _isLoading = true;
     });
+
+    try {
+      final reply = await _aiService.generateResponse(text);
+      setState(() {
+        _messages.add(_Message(text: reply, isUser: false));
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add(_Message(text: 'Error: $e', isUser: false));
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+        _controller.clear();
+      });
+    }
   }
 
   @override
@@ -72,6 +89,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
               },
             ),
           ),
+          if (_isLoading) LinearProgressIndicator(color: AppColors.accent),
           const Divider(height: 1),
           Container(
             color: Colors.white,
@@ -81,9 +99,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                 IconButton(
                   icon: const Icon(Icons.mic),
                   color: AppColors.primary,
-                  onPressed: () {
-                    // TODO: voice capture
-                  },
+                  onPressed: () {}, // voice capture integration later
                 ),
                 Expanded(
                   child: TextField(
@@ -93,12 +109,13 @@ class _ChatPageState extends ConsumerState<ChatPage> {
                       hintStyle: TextStyle(color: AppColors.textSecondary),
                       border: InputBorder.none,
                     ),
+                    onSubmitted: (_) => _sendMessage(),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.send),
                   color: AppColors.primary,
-                  onPressed: _sendMessage,
+                  onPressed: _isLoading ? null : _sendMessage,
                 ),
               ],
             ),
