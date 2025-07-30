@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Import your actual page files
-import '../onboarding/role_selection_page.dart';
-import '../onboarding/language_selection_page.dart';
-import '../auth/login_page.dart';
+import '../../shared/constants/colors.dart';
+import '../../shared/widgets/gradient_button.dart';
+import 'role_selection_page.dart';
+import 'language_selection_page.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   static const routeName = '/onboarding';
@@ -16,48 +16,25 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
-  final List<Map<String, dynamic>> _pageData = [];
-
-  @override
-  void initState() {
-    super.initState();
-    final introData = [
-      {
-        'title': 'Welcome to RightNow',
-        'description': 'Your companion to know and act on your legal rights quickly.',
-        'image': Icons.shield,
-      },
-      {
-        'title': 'Voice & USSD Access Offline',
-        'description': 'Get guidance via voice in local languages or simulate USSD menus offline.',
-        'image': Icons.phone_android,
-      }
-    ];
-    for (var item in introData) {
-      _pageData.add(item);
-    }
-  }
-
-  Widget _buildIntroPage(BuildContext context, String title, String description, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(icon, size: 150, color: Colors.black),
-          const SizedBox(height: 40),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 16),
-          Text(description, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: Colors.black54)),
-        ],
-      ),
-    );
-  }
+  final List<Map<String, dynamic>> _pages = [
+    {
+      'title': 'Welcome to RightNow',
+      'description': 'Your companion to know and act on your legal rights quickly.',
+      'icon': Icons.shield,
+    },
+    {
+      'title': 'Offline Voice & USSD',
+      'description': 'Get guidance via voice in local languages or simulate USSD menus offline.',
+      'icon': Icons.phone_android,
+    },
+  ];
 
   void _onNext() {
-    if (_currentIndex < _pageData.length - 1) {
-      _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+    if (_currentIndex < _pages.length - 1) {
+      _controller.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
     } else {
       Navigator.pushReplacementNamed(context, RoleSelectionPage.routeName);
     }
@@ -65,70 +42,74 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalPages = _pageData.length;
-    if (totalPages == 0) {
-      return const Scaffold(body: Center(child: Text("Loading onboarding...")));
-    }
-
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: totalPages, // PageView only for intro slides
-                onPageChanged: (index) {
-                  setState(() => _currentIndex = index);
-                },
+                itemCount: _pages.length,
+                onPageChanged: (i) => setState(() => _currentIndex = i),
                 itemBuilder: (context, index) {
-                  // Only build intro pages here
-                  final dataItem = _pageData[index];
-                  return _buildIntroPage(
-                    context,
-                    dataItem['title'] as String,
-                    dataItem['description'] as String,
-                    dataItem['image'] as IconData,
+                  final page = _pages[index];
+                  return Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(page['icon'], size: 150, color: AppColors.primary),
+                        const SizedBox(height: 40),
+                        Text(
+                          page['title'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          page['description'],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      totalPages, // Dots only for intro slides
-                          (dotIndex) => AnimatedContainer(
+                      _pages.length,
+                          (i) => AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
                         margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 10,
-                        width: _currentIndex == dotIndex ? 30 : 10,
+                        width: _currentIndex == i ? 28 : 8,
+                        height: 8,
                         decoration: BoxDecoration(
-                          color: _currentIndex == dotIndex ? Colors.black : Colors.grey[400],
-                          borderRadius: BorderRadius.circular(5),
+                          color: _currentIndex == i ? AppColors.primary : AppColors.textSecondary,
+                          borderRadius: BorderRadius.circular(4),
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: _onNext,
-                      child: Text(
-                        _currentIndex == totalPages - 1 ? 'Continue' : 'Next',
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ),
+                  GradientButton(
+                    text: _currentIndex == _pages.length - 1 ? 'Continue' : 'Next',
+                    onPressed: _onNext,
+                    gradientColors: [AppColors.primary, AppColors.accent],
                   ),
                 ],
               ),

@@ -4,7 +4,7 @@ class IntroPage extends StatelessWidget {
   final String title;
   final String description;
   final IconData image;
-  const IntroPage({required this.title, required this.description, required this.image});
+  const IntroPage({super.key, required this.title, required this.description, required this.image});
   @override
   Widget build(BuildContext context) {
     return SafeArea(

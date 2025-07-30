@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'signup_page.dart';
 import '../home/home_page.dart';
+import 'signup_page.dart';
+import '../../shared/constants/colors.dart';
+import '../../shared/widgets/gradient_button.dart';
 
 class LoginPage extends StatelessWidget {
   static const routeName = '/login';
@@ -14,6 +16,7 @@ class LoginPage extends StatelessWidget {
     String? password;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
@@ -27,14 +30,14 @@ class LoginPage extends StatelessWidget {
                 const Icon(
                   Icons.account_circle,
                   size: 100,
-                  color: Colors.black,
+                  color: AppColors.primary,
                 ),
                 const SizedBox(height: 10),
                 const Text(
                   'Login to continue',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.primary,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -47,7 +50,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
+                          prefixIcon: Icon(Icons.email, color: AppColors.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -62,7 +65,7 @@ class LoginPage extends StatelessWidget {
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock),
+                          prefixIcon: Icon(Icons.lock, color: AppColors.primary),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -77,57 +80,41 @@ class LoginPage extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            // TODO: Forgot password functionality
-                          },
+                          onPressed: () {},
                           child: const Text(
                             'Forgot Password?',
-                            style: TextStyle(color: Colors.black),
+                            style: TextStyle(color: AppColors.primary),
                           ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
+                      GradientButton(
+                        text: 'LOGIN',
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            Navigator.pushReplacementNamed(
+                                context, HomePage.routeName);
+                          }
+                        },
+                        gradientColors: [AppColors.primary, AppColors.accent],
                         height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              // TODO: handle login logic
-                              Navigator.pushReplacementNamed(
-                                  context, HomePage.routeName
-                              );
-                            }
-                          },
-                          child: const Text(
-                            'LOGIN',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Don't have an account?", style: TextStyle(color: Colors.grey[700])),
+                          Text(
+                            "Don't have an account?",
+                            style: TextStyle(color: AppColors.textSecondary),
+                          ),
                           TextButton(
                             onPressed: () => Navigator.pushReplacementNamed(
                                 context, SignupPage.routeName),
                             child: const Text(
                               'Sign Up',
                               style: TextStyle(
-                                color: Colors.black,
+                                color: AppColors.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
