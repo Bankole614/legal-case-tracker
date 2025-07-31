@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+
 import 'shared/constants/colors.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
@@ -13,22 +15,33 @@ final ThemeData rightNowTheme = ThemeData(
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.background,
   fontFamily: 'Manrope',
-  textTheme: TextTheme(
+  textTheme: const TextTheme(
     bodyLarge: TextStyle(fontSize: 16, color: AppColors.textPrimary),
     bodyMedium: TextStyle(fontSize: 14, color: AppColors.textSecondary),
     titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      foregroundColor: Colors.white, backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      backgroundColor: AppColors.primary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
     ),
   ),
 );
 
-void main() {
-  runApp(ProviderScope(child: RightNowApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  const String geminiApiKey = 'AIzaSyDFQ3w26Zz_qR91E3-Uog9aG-nIb28uS3w';
+
+  if (geminiApiKey.isEmpty) {
+    throw Exception('Gemini API key is missing. Set it in main.dart');
+  }
+
+  Gemini.init(apiKey: geminiApiKey);
+
+  runApp(const ProviderScope(child: RightNowApp()));
 }
 
 class RightNowApp extends ConsumerWidget {
