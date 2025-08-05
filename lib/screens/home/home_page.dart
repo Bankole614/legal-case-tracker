@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
-import 'dashboard_page.dart';
-import 'chat_page.dart';
-import 'ussd_page.dart';
-import 'profile_page.dart';
+import 'dashboard_page.dart';    // Your case list / dashboard
+import 'chat_page.dart';         // Gemini AI chat
+import 'documents_page.dart';    // New document uploads page
+import 'profile_page.dart';      // User profile
 
 class HomePage extends ConsumerStatefulWidget {
   static const routeName = '/home';
 
   const HomePage({super.key});
+
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
 }
@@ -23,11 +24,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-
   late final List<Widget> _tabs = [
     DashboardPage(onNavigateToTab: _changeTab),
     ChatPage(),
-    USSDDialerScreen(),
+    DocumentsPage(),
     ProfilePage(),
   ];
 
@@ -48,18 +48,29 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
+          onTap: _changeTab,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'USSD'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat),
+              label: 'Chat',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.insert_drive_file),
+              label: 'Docs',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
           ],
         ),
-      )
-
+      ),
     );
   }
 }
