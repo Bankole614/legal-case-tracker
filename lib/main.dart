@@ -1,4 +1,5 @@
-import 'package:case_tracker/screens/home/case_list_page.dart';
+import 'screens/home/add_case_page.dart';
+import 'screens/home/case_list_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
@@ -63,7 +64,7 @@ class RightNowApp extends ConsumerWidget {
         LoginPage.routeName: (_) => LoginPage(),
         SignupPage.routeName: (_) => SignupPage(),
         HomePage.routeName: (_) => HomePage(),
-        '/add-case': (_) => const AddCasePage(),    // your add-case form
+        '/add-case': (_) => const AddCasePage(),
         '/case-detail': (_) => const CaseListPage(), // view/edit a single case
       },
     );

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
-import 'dashboard_page.dart';    // Your case list / dashboard
-import 'chat_page.dart';         // Gemini AI chat
-import 'documents_page.dart';    // New document uploads page
-import 'profile_page.dart';      // User profile
+import 'case_list_page.dart';
+import 'chat_page.dart';
+import 'documents_page.dart';
+import 'profile_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   static const routeName = '/home';
-
   const HomePage({super.key});
 
   @override
@@ -18,18 +17,16 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   int _currentIndex = 0;
 
-  void _changeTab(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  late final List<Widget> _tabs = [
-    DashboardPage(onNavigateToTab: _changeTab),
+  final _tabs = const [
+    CaseListPage(),    // directly your case list
     ChatPage(),
     DocumentsPage(),
     ProfilePage(),
   ];
+
+  void _onTabTapped(int index) {
+    setState(() => _currentIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,26 +45,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: _changeTab,
+          onTap: _onTabTapped,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,
           items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat),
-              label: 'Chat',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.insert_drive_file),
-              label: 'Docs',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.folder), label: 'Cases'),
+            BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
+            BottomNavigationBarItem(icon: Icon(Icons.insert_drive_file), label: 'Docs'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
       ),

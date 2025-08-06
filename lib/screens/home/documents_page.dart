@@ -3,15 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
 
+import '../../shared/constants/colors.dart';
+
 class DocumentsPage extends ConsumerStatefulWidget {
-  const DocumentsPage({Key? key}) : super(key: key);
+  const DocumentsPage({super.key});
 
   @override
   ConsumerState<DocumentsPage> createState() => _DocumentsPageState();
 }
 
 class _DocumentsPageState extends ConsumerState<DocumentsPage> {
-  List<String> _documents = [];
+  final List<String> _documents = [];
   bool _isUploading = false;
 
   Future<void> _pickAndUpload() async {
@@ -51,7 +53,10 @@ class _DocumentsPageState extends ConsumerState<DocumentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Documents'),
+        backgroundColor: AppColors.primary,
+        title: const Text('Documents', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

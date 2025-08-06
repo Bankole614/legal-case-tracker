@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../models/case_model.dart';
-import '../providers/case_provider.dart';
+import '../../providers/case_provider.dart';
+import '../../models/case_model.dart';
+import '../../providers/case_provider.dart';
 
 class CaseDetailPage extends ConsumerWidget {
   static const routeName = '/case-detail';
 
   final String caseId;
 
-  const CaseDetailPage({Key? key, required this.caseId}) : super(key: key);
+  const CaseDetailPage({super.key, required this.caseId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

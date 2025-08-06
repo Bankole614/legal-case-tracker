@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
-import '../cases/case_list_page.dart'; // import the case list
+import 'case_list_page.dart';
 import '../../providers/app_providers.dart';
 
 class DashboardPage extends ConsumerWidget {
-  const DashboardPage({super.key});
+  const DashboardPage({super.key, required void Function(int index) onNavigateToTab});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
