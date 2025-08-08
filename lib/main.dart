@@ -12,6 +12,7 @@ import 'screens/auth/signup_page.dart';
 import 'screens/home/home_page.dart';
 import 'screens/onboarding/language_selection_page.dart';
 import 'screens/onboarding/role_selection_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final ThemeData rightNowTheme = ThemeData(
   primaryColor: AppColors.primary,
@@ -34,6 +35,7 @@ final ThemeData rightNowTheme = ThemeData(
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   const String geminiApiKey = 'AIzaSyDFQ3w26Zz_qR91E3-Uog9aG-nIb28uS3w';
 
