@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../auth/login_page.dart';
 import '../../shared/constants/colors.dart';
 import '../../shared/widgets/gradient_button.dart';
-import 'role_selection_page.dart';
-import 'language_selection_page.dart';
 
-class OnboardingScreen extends ConsumerStatefulWidget {
+class OnboardingScreen extends StatefulWidget {
   static const routeName = '/onboarding';
+
   const OnboardingScreen({super.key});
 
   @override
-  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentIndex = 0;
+  final _storage = const FlutterSecureStorage();
+
   final List<Map<String, dynamic>> _pages = [
     {
       'title': 'Welcome to RightNow',
@@ -29,14 +31,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     },
   ];
 
-  void _onNext() {
+  void _onNext() async {
     if (_currentIndex < _pages.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
     } else {
-      Navigator.pushReplacementNamed(context, RoleSelectionPage.routeName);
+      await _storage.write(key: 'seenOnboarding', value: 'true');
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, LoginPage.routeName);
     }
   }
 
@@ -107,7 +111,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   ),
                   const SizedBox(height: 24),
                   GradientButton(
-                    text: _currentIndex == _pages.length - 1 ? 'Continue' : 'Next',
+                    text: _currentIndex == _pages.length - 1 ? 'Get Started' : 'Next',
                     onPressed: _onNext,
                     gradientColors: [AppColors.primary, AppColors.accent],
                   ),

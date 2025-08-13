@@ -1,10 +1,10 @@
-// lib/screens/onboarding/role_selection_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../../providers/app_providers.dart';
 import 'language_selection_page.dart';
+import '../auth/signup_page.dart';
 
 class _Option {
   final String name;
@@ -88,11 +88,11 @@ class RoleSelectionPage extends ConsumerWidget {
               const Spacer(),
               selectedRole != null && selectedRole.isNotEmpty
                   ? GradientButton(
-                text: 'Continue to Language Selection',
+                text: 'Continue to Signup',
                 onPressed: () {
                   Navigator.pushNamed(
                     context,
-                    LanguageSelectionPage.routeName,
+                    SignupPage.routeName,
                   );
                 },
                 gradientColors: [AppColors.primary, AppColors.accent],
@@ -106,7 +106,7 @@ class RoleSelectionPage extends ConsumerWidget {
                 ),
                 alignment: Alignment.center,
                 child: const Text(
-                  'Continue to Language Selection',
+                  'Continue to Signup',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

@@ -1,36 +1,59 @@
+// lib/shared/widgets/gradient_button.dart
 import 'package:flutter/material.dart';
 
 class GradientButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final List<Color> gradientColors;
-  final double width;
   final double height;
+  final bool isLoading;
 
   const GradientButton({
-    super.key,
     required this.text,
     required this.onPressed,
-    this.gradientColors = const [Color(0xFF003366), Color(0xFF2E7D32)],
-    this.width = double.infinity,
-    this.height = 56,
+    required this.gradientColors,
+    this.height = 50,
+    this.isLoading = false,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: gradientColors),
-          borderRadius: BorderRadius.circular(12),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: gradientColors,
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
-        alignment: Alignment.center,
-        child: Text(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          minimumSize: Size.fromHeight(height),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+          height: 24,
+          width: 24,
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 2,
+          ),
+        )
+            : Text(
           text,
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );

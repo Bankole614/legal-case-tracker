@@ -1,21 +1,71 @@
+// lib/pages/auth/signup_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../shared/widgets/auth_widgets.dart';
+import '../../shared/widgets/gradient_button.dart';
+import '../../shared/constants/colors.dart';
+import '../../stores/auth_store.dart';
 import '../home/home_page.dart';
 import 'login_page.dart';
-import '../../shared/constants/colors.dart';
-import '../../shared/widgets/gradient_button.dart';
 
-class SignupPage extends StatelessWidget {
+class SignupPage extends ConsumerStatefulWidget {
   static const routeName = '/signup';
-  final _formKey = GlobalKey<FormState>();
 
-  SignupPage({super.key});
+  const SignupPage({super.key});
+
+  @override
+  ConsumerState<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends ConsumerState<SignupPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await ref.read(authStoreProvider.notifier).signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        passwordConfirmation: _confirmController.text,
+      );
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, HomePage.routeName);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    String? fullName;
-    String? email;
-    String? passwordValue;
-    String? phone;
+    final authState = ref.watch(authStoreProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -26,138 +76,106 @@ class SignupPage extends StatelessWidget {
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 40),
-                const Text(
-                  'Create Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppColors.primary,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                const AuthHeader(
+                  icon: Icons.person_add,
+                  title: 'Create Account',
                 ),
                 const SizedBox(height: 40),
                 Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Full Name',
-                          prefixIcon: Icon(Icons.person, color: AppColors.primary),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AuthTextField(
+                              controller: _firstNameController,
+                              label: 'First Name',
+                              icon: Icons.person,
+                              validator: (v) => v?.isNotEmpty ?? false
+                                  ? null
+                                  : 'Please enter first name',
+                            ),
                           ),
-                        ),
-                        onSaved: (v) => fullName = v,
-                        validator: (v) => v != null && v.isNotEmpty
-                            ? null
-                            : 'Please enter your name',
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: AuthTextField(
+                              controller: _lastNameController,
+                              label: 'Last Name',
+                              icon: Icons.person,
+                              validator: (v) => v?.isNotEmpty ?? false
+                                  ? null
+                                  : 'Please enter last name',
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email, color: AppColors.primary),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AuthTextField(
+                        controller: _emailController,
+                        label: 'Email',
+                        icon: Icons.email,
                         keyboardType: TextInputType.emailAddress,
-                        onSaved: (v) => email = v,
                         validator: (v) => v != null && v.contains('@')
                             ? null
                             : 'Enter a valid email',
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Phone Number',
-                          prefixIcon: Icon(Icons.phone, color: AppColors.primary),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AuthTextField(
+                        controller: _phoneController,
+                        label: 'Phone Number',
+                        icon: Icons.phone,
                         keyboardType: TextInputType.phone,
-                        onSaved: (v) => phone = v,
-                        validator: (v) => v != null && v.length >= 8
+                        validator: (v) => v!.length >= 8 ?? false
                             ? null
                             : 'Enter a valid phone number',
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          prefixIcon: Icon(Icons.lock, color: AppColors.primary),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AuthTextField(
+                        controller: _passwordController,
+                        label: 'Password',
+                        icon: Icons.lock,
                         obscureText: true,
-                        onChanged: (value) => passwordValue = value,
-                        onSaved: (v) => passwordValue = v,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Please enter a password';
+                          if (v == null || v.isEmpty) return 'Please enter password';
                           if (v.length < 8) return 'Minimum 8 characters';
                           return null;
                         },
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: 'Confirm Password',
-                          prefixIcon: Icon(Icons.lock_outline, color: AppColors.primary),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
+                      AuthTextField(
+                        controller: _confirmController,
+                        label: 'Confirm Password',
+                        icon: Icons.lock_outline,
                         obscureText: true,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Please confirm your password';
-                          if (passwordValue != v) return 'Passwords do not match';
+                          if (v == null || v.isEmpty) return 'Please confirm password';
+                          if (_passwordController.text != v) return 'Passwords don\'t match';
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 30),
+                      GradientButton(
+                        text: 'SIGN UP',
+                        onPressed: authState.isLoading ? null : _submit,
+                        isLoading: authState.isLoading,
+                        gradientColors: [AppColors.primary, AppColors.accent],
+                        height: 50,
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
-                // Use GradientButton for signup
-                GradientButton(
-                  text: 'SIGN UP',
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      Navigator.pushReplacementNamed(context, HomePage.routeName);
-                    }
-                  },
-                  gradientColors: [AppColors.primary, AppColors.accent],
-                  height: 50,
-                ),
                 const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Already have an account?",
-                      style: TextStyle(color: AppColors.textSecondary),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pushReplacementNamed(
-                        context,
-                        LoginPage.routeName,
-                      ),
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                AuthFooter(
+                  promptText: "Already have an account?",
+                  actionText: 'Login',
+                  onAction: () => Navigator.pushReplacementNamed(
+                    context,
+                    LoginPage.routeName,
+                  ),
                 ),
               ],
             ),

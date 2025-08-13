@@ -45,6 +45,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
+          backgroundColor: Colors.white,
           onTap: _onTabTapped,
           type: BottomNavigationBarType.fixed,
           selectedItemColor: AppColors.primary,
