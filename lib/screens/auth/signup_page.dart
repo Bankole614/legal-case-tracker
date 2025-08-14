@@ -1,23 +1,22 @@
 // lib/pages/auth/signup_page.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import '../../shared/widgets/auth_widgets.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../../shared/constants/colors.dart';
-import '../../stores/auth_store.dart';
 import '../home/home_page.dart';
 import 'login_page.dart';
 
-class SignupPage extends ConsumerStatefulWidget {
+class SignupPage extends StatefulWidget {
   static const routeName = '/signup';
 
   const SignupPage({super.key});
 
   @override
-  ConsumerState<SignupPage> createState() => _SignupPageState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupPageState extends ConsumerState<SignupPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -25,6 +24,11 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  bool _isLoading = false;
+
+  // Replace these with your actual values
+  final String projectIdentifier = '01k2582fn9q5by5aej0xdqyvy1';
+  final String apiKey = 'dev_5YOE9TIWD4D7GLvGojwFatGE';
 
   @override
   void dispose() {
@@ -40,33 +44,72 @@ class _SignupPageState extends ConsumerState<SignupPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      await ref.read(authStoreProvider.notifier).signUp(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        passwordConfirmation: _confirmController.text,
+      final dio = Dio();
+      final response = await dio.post(
+        'https://core.hisend.hunnovate.com/api/v1/projects/$projectIdentifier/auth/sign-up?api_key=$apiKey',
+        data: {
+          'first_name': _firstNameController.text.trim(),
+          'last_name': _lastNameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'phone': _phoneController.text.trim(),
+          'password': _passwordController.text,
+          'password_confirmation': _confirmController.text,
+        },
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        ),
       );
 
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, HomePage.routeName);
-    } catch (e) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Success
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, HomePage.routeName);
+      } else {
+        // Handle other status codes
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.data['message'] ?? 'Signup failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.response != null) {
+        errorMessage = e.response?.data['message'] ??
+            e.response?.data['error'] ??
+            'Signup failed';
+      } else {
+        errorMessage = e.message ?? 'Network error';
+      }
+
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString()),
+          content: Text(errorMessage),
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStoreProvider);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SingleChildScrollView(
@@ -129,7 +172,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         label: 'Phone Number',
                         icon: Icons.phone,
                         keyboardType: TextInputType.phone,
-                        validator: (v) => v!.length >= 8 ?? false
+                        validator: (v) => v!.length >= 8
                             ? null
                             : 'Enter a valid phone number',
                       ),
@@ -160,8 +203,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       const SizedBox(height: 30),
                       GradientButton(
                         text: 'SIGN UP',
-                        onPressed: authState.isLoading ? null : _submit,
-                        isLoading: authState.isLoading,
+                        onPressed: _isLoading ? null : _submit,
+                        isLoading: _isLoading,
                         gradientColors: [AppColors.primary, AppColors.accent],
                         height: 50,
                       ),
