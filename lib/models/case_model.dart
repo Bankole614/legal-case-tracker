@@ -1,41 +1,18 @@
-class LegalCase {
+class CaseModel {
   final String id;
   final String title;
-  final String description;
-  final String caseType;
-  final DateTime createdAt;
-  final DateTime? nextCourtDate;
-
-  LegalCase({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.caseType,
-    required this.createdAt,
-    this.nextCourtDate,
-  });
-
-  factory LegalCase.fromJson(Map<String, dynamic> json) {
-    return LegalCase(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String? ?? '',
-      caseType: json['caseType'] as String? ?? '',
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      nextCourtDate: json['nextCourtDate'] != null
-          ? DateTime.parse(json['nextCourtDate'] as String)
-          : null,
+  final String? description;
+  final String status;
+  CaseModel({required this.id, required this.title, this.description, this.status = 'open'});
+  factory CaseModel.fromJson(Map<String, dynamic> json) {
+    return CaseModel(
+      id: json['id']?.toString() ?? json['record_id']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      description: json['description']?.toString(),
+      status: json['status']?.toString() ?? 'open',
     );
   }
-
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'caseType': caseType,
-      'createdAt': createdAt.toIso8601String(),
-      'nextCourtDate': nextCourtDate?.toIso8601String(),
-    };
+    return {'title': title, if (description != null) 'description': description, 'status': status};
   }
 }

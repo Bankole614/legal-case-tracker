@@ -95,7 +95,7 @@ class RoleSelectionPage extends ConsumerWidget {
                     SignupPage.routeName,
                   );
                 },
-                gradientColors: [AppColors.primary, AppColors.accent],
+                gradient: [AppColors.primary, AppColors.accent],
                 height: 50,
               )
                   : Container(

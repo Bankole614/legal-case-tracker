@@ -18,7 +18,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   int _currentIndex = 0;
 
   final _tabs = const [
-    CaseListPage(),    // directly your case list
+    CaseListPage(),
     ChatPage(),
     DocumentsPage(),
     ProfilePage(),

@@ -1,91 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import '../../providers/case_provider.dart';
 import '../../models/case_model.dart';
-import '../../providers/case_provider.dart';
+import '../../stores/case_store.dart';
 
-class CaseDetailPage extends ConsumerWidget {
-  static const routeName = '/case-detail';
-
+class CaseDetailPage extends ConsumerStatefulWidget {
   final String caseId;
-
-  const CaseDetailPage({super.key, required this.caseId});
-
+  const CaseDetailPage({required this.caseId, super.key});
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final caseAsync = ref.watch(caseDetailProvider(caseId));
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Case Details'),
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // TODO: navigate to edit-case form
-            },
-          ),
-        ],
-      ),
-      body: caseAsync.when(
-        data: (legalCase) => _buildDetail(context, legalCase),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
-      ),
-    );
-  }
-
-  Widget _buildDetail(BuildContext context, LegalCase c) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: [
-          Text(
-            c.title,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            c.description.isNotEmpty ? c.description : 'No description provided',
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Icon(Icons.calendar_today),
-              const SizedBox(width: 8),
-              Text(
-                'Next Court Date: ${c.nextCourtDate != null ? DateFormat.yMMMd().format(c.nextCourtDate!) : 'TBD'}',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          const Divider(height: 32),
-          const Text('Tasks', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          // TODO: list tasks (could navigate to tasks page or inline list)
-          ElevatedButton.icon(
-            onPressed: () {
-              // TODO: add task
-            },
-            icon: const Icon(Icons.add_task),
-            label: const Text('Add Task'),
-          ),
-          const Divider(height: 32),
-          const Text('Documents', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: () {
-              // TODO: navigate to DocumentsPage with filter for this case
-            },
-            icon: const Icon(Icons.upload_file),
-            label: const Text('Add Document'),
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<CaseDetailPage> createState() => _CaseDetailPageState();
 }
 
+class _CaseDetailPageState extends ConsumerState<CaseDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Could implement a method to load single case (not implemented above),
+    // Here we refresh list and pick the case from the list
+    ref.read(caseStoreProvider.notifier).loadCases();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(caseStoreProvider);
+    final c = state.items.firstWhere((e) => e.id == widget.caseId, orElse: () => CaseModel(id: widget.caseId, title: 'Unknown'));
+    return Scaffold(appBar: AppBar(title: Text('Case ${c.title}')), body: Padding(padding: const EdgeInsets.all(12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Title: ${c.title}', style: const TextStyle(fontSize: 18)), const SizedBox(height: 8), Text('Status: ${c.status}'), const SizedBox(height: 8), Text('Description: ${c.description ?? "-"}') ])));
+  }
+}

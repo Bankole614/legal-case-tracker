@@ -1,60 +1,22 @@
-// lib/shared/widgets/gradient_button.dart
 import 'package:flutter/material.dart';
 
 class GradientButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
-  final List<Color> gradientColors;
   final double height;
+  final List<Color> gradient;
   final bool isLoading;
-
-  const GradientButton({
-    required this.text,
-    required this.onPressed,
-    required this.gradientColors,
-    this.height = 50,
-    this.isLoading = false,
-    super.key,
-  });
+  const GradientButton({super.key, required this.text, required this.onPressed, this.height = 52, this.gradient = const [Color(0xFF0D47A1), Color(0xFF1976D2)], this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: gradientColors,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          minimumSize: Size.fromHeight(height),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-          height: 24,
-          width: 24,
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
-          ),
-        )
-            : Text(
-          text,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        height: height,
+        decoration: BoxDecoration(gradient: LinearGradient(colors: gradient), borderRadius: BorderRadius.circular(10)),
+        alignment: Alignment.center,
+        child: isLoading ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
