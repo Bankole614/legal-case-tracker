@@ -15,6 +15,14 @@ import 'screens/onboarding/role_selection_page.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final ThemeData rightNowTheme = ThemeData(
+  appBarTheme: AppBarTheme(
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+      centerTitle: true
+  ),
   primaryColor: AppColors.primary,
   scaffoldBackgroundColor: AppColors.background,
   fontFamily: 'Manrope',
@@ -66,7 +74,7 @@ class RightNowApp extends ConsumerWidget {
         LoginPage.routeName: (_) => LoginPage(),
         SignupPage.routeName: (_) => SignupPage(),
         HomePage.routeName: (_) => HomePage(),
-        '/add-case': (_) => const AddCasePage(),
+        '/add-case': (_) => const CaseCreatePage(),
         '/case-detail': (_) => const CaseListPage(), // view/edit a single case
       },
     );

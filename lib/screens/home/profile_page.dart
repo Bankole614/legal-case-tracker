@@ -79,7 +79,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> { // Changed
               ),
               const SizedBox(height: 16),
               Text(
-                authState.user?.firstName ?? 'User',
+                // authState.user?.firstName ?? 'User',
+                'User',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -104,7 +105,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> { // Changed
                 onPressed: () {
                   Navigator.pushNamed(context, '/settings');
                 },
-                gradientColors: [AppColors.primary, AppColors.accent],
+                // gradientColors: [AppColors.primary, AppColors.accent],
                 height: 50,
               ),
               const SizedBox(height: 16),

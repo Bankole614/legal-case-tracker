@@ -8,6 +8,7 @@ class HiSendConfig {
   final String projectId;
   final String apiKey;
   final String baseUrl;
+
   HiSendConfig({
     required this.projectId,
     required this.apiKey,
@@ -16,8 +17,8 @@ class HiSendConfig {
 }
 
 final hisendConfigProvider = Provider<HiSendConfig>((ref) {
-  final projectId = dotenv.env['HISEND_PROJECT_ID'] ?? '';
-  final apiKey = dotenv.env['HISEND_API_KEY'] ?? '';
+  final projectId = dotenv.env['HISEND_PROJECT_ID'] ?? '01k2582fn9q5by5aej0xdqyvy1';
+  final apiKey = dotenv.env['HISEND_API_KEY'] ?? 'dev_5YOE9TIWD4D7GLvGojwFatGE';
   return HiSendConfig(projectId: projectId, apiKey: apiKey);
 });
 
@@ -29,14 +30,19 @@ final dioProvider = Provider<Dio>((ref) {
   final cfg = ref.read(hisendConfigProvider);
   final storage = ref.read(secureStorageProvider);
 
-  final dio = Dio(BaseOptions(baseUrl: cfg.baseUrl, connectTimeout: const Duration(seconds: 15)));
+  final dio = Dio(BaseOptions(
+    baseUrl: cfg.baseUrl,
+    connectTimeout: const Duration(seconds: 15),
+    receiveTimeout: const Duration(seconds: 15),
+  ));
+
   // Interceptor: add api_key query and bearer if token exists
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
       // Add api_key as query parameter if not already present
       options.queryParameters ??= {};
-      if (!options.queryParameters!.containsKey('api_key')) {
-        options.queryParameters!['api_key'] = cfg.apiKey;
+      if (!options.queryParameters.containsKey('api_key')) {
+        options.queryParameters['api_key'] = cfg.apiKey;
       }
 
       // Attach bearer token if saved
@@ -48,5 +54,6 @@ final dioProvider = Provider<Dio>((ref) {
     },
     onError: (e, handler) => handler.next(e),
   ));
+
   return dio;
 });

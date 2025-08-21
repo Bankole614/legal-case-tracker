@@ -4,12 +4,18 @@ import '../providers/core_providers.dart';
 class AuthRepository {
   final Dio dio;
   final HiSendConfig cfg;
+
   AuthRepository({required this.dio, required this.cfg});
 
   String _base(String path) => 'projects/${cfg.projectId}/auth/$path';
 
   Future<String?> login({required String email, required String password}) async {
-    final resp = await dio.post(_base('login'), data: {'email': email, 'password': password}, queryParameters: {'api_key': cfg.apiKey});
+    final resp = await dio.post(
+        _base('login'),
+        data: {'email': email, 'password': password},
+        queryParameters: {'api_key': cfg.apiKey}
+    );
+
     final data = resp.data;
     if (data is Map && (data['token'] != null || data['access_token'] != null)) {
       return data['token'] ?? data['access_token'];
@@ -36,7 +42,13 @@ class AuthRepository {
       'phone': phone,
       if (passwordConfirmation != null) 'password_confirmation': passwordConfirmation,
     };
-    final resp = await dio.post(_base('sign-up'), data: body, queryParameters: {'api_key': cfg.apiKey});
+
+    final resp = await dio.post(
+        _base('sign-up'),
+        data: body,
+        queryParameters: {'api_key': cfg.apiKey}
+    );
+
     final data = resp.data;
     if (data is Map && data['token'] != null) return data['token'];
     if (data is Map && data['data'] is Map) return data['data']['token'];
@@ -44,11 +56,20 @@ class AuthRepository {
   }
 
   Future<void> logout(String token) async {
-    await dio.post(_base('logout'), options: Options(headers: {'Authorization': 'Bearer $token'}), queryParameters: {'api_key': cfg.apiKey});
+    await dio.post(
+        _base('logout'),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        queryParameters: {'api_key': cfg.apiKey}
+    );
   }
 
   Future<Map<String, dynamic>> getUserRaw(String token) async {
-    final resp = await dio.get(_base('user'), options: Options(headers: {'Authorization': 'Bearer $token'}), queryParameters: {'api_key': cfg.apiKey});
+    final resp = await dio.get(
+        _base('user'),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+        queryParameters: {'api_key': cfg.apiKey}
+    );
+
     final data = resp.data;
     if (data is Map && data['data'] is Map) return Map<String, dynamic>.from(data['data']);
     if (data is Map) return Map<String, dynamic>.from(data);

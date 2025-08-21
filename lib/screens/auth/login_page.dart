@@ -17,7 +17,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  bool _loading = false;
 
   @override
   void dispose() {
@@ -28,33 +27,64 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
-    final ok = await ref.read(authStoreProvider.notifier).login(email: _email.text.trim(), password: _password.text);
-    setState(() => _loading = false);
+
+    final ok = await ref.read(authStoreProvider.notifier).login(
+      email: _email.text.trim(),
+      password: _password.text,
+    );
+
     if (ok) {
       if (!mounted) return;
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage()));
     } else {
       final error = ref.read(authStoreProvider).error ?? 'Login failed';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error), backgroundColor: Colors.red));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red)
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authStoreProvider).isLoading;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(key: _formKey, child: Column(children: [
-          AuthTextField(controller: _email, label: 'Email', icon: Icons.email, keyboardType: TextInputType.emailAddress, validator: (v) => v != null && v.contains('@') ? null : 'Invalid email'),
-          const SizedBox(height: 12),
-          AuthTextField(controller: _password, label: 'Password', icon: Icons.lock, obscureText: true, validator: (v) => v != null && v.length >= 6 ? null : 'Min 6 chars'),
-          const SizedBox(height: 20),
-          GradientButton(text: 'Login', onPressed: _loading ? null : _submit, isLoading: _loading),
-          const SizedBox(height: 12),
-          TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignupPage())), child: const Text("Don't have account? Sign up"))
-        ])),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              AuthTextField(
+                  controller: _email,
+                  label: 'Email',
+                  icon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) => v != null && v.contains('@') ? null : 'Invalid email'
+              ),
+              const SizedBox(height: 12),
+              AuthTextField(
+                  controller: _password,
+                  label: 'Password',
+                  icon: Icons.lock,
+                  obscureText: true,
+                  validator: (v) => v != null && v.length >= 6 ? null : 'Min 6 chars'
+              ),
+              const SizedBox(height: 20),
+              GradientButton(
+                  text: 'Login',
+                  onPressed: isLoading ? null : _submit,
+                  isLoading: isLoading
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignupPage())),
+                  child: const Text("Don't have account? Sign up")
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
