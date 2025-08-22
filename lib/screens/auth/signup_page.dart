@@ -1,3 +1,4 @@
+// lib/pages/auth/signup_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/widgets/auth_widgets.dart';

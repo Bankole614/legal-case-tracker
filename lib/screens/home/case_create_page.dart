@@ -7,6 +7,7 @@ import '../../stores/case_store.dart';
 import '../../models/case_model.dart';
 
 class CaseCreatePage extends ConsumerStatefulWidget {
+  static const routeName = '/add-case';
   const CaseCreatePage({super.key});
 
   @override

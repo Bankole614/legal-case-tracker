@@ -1,9 +1,9 @@
+// lib/providers/core_providers.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// HiSend config model
+/// HiSend config holder
 class HiSendConfig {
   final String projectId;
   final String apiKey;
@@ -12,48 +12,77 @@ class HiSendConfig {
   HiSendConfig({
     required this.projectId,
     required this.apiKey,
-    this.baseUrl = 'https://core.hisend.hunnovate.com/api/v1/',
+    required this.baseUrl,
   });
 }
 
+/// Provide your HiSend credentials here
 final hisendConfigProvider = Provider<HiSendConfig>((ref) {
-  final projectId = dotenv.env['HISEND_PROJECT_ID'] ?? '01k2582fn9q5by5aej0xdqyvy1';
-  final apiKey = dotenv.env['HISEND_API_KEY'] ?? 'dev_5YOE9TIWD4D7GLvGojwFatGE';
-  return HiSendConfig(projectId: projectId, apiKey: apiKey);
+  return HiSendConfig(
+    projectId: '01k2582fn9q5by5aej0xdqyvy1',
+    apiKey: 'dev_5YOE9TIWD4D7GLvGojwFatGE',
+    baseUrl: 'https://core.hisend.hunnovate.com/api/v1/',
+  );
 });
 
+/// Secure storage provider
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
   return const FlutterSecureStorage();
 });
 
+/// Dio provider
 final dioProvider = Provider<Dio>((ref) {
   final cfg = ref.read(hisendConfigProvider);
-  final storage = ref.read(secureStorageProvider);
+  final secureStorage = ref.read(secureStorageProvider);
 
-  final dio = Dio(BaseOptions(
+  final options = BaseOptions(
     baseUrl: cfg.baseUrl,
     connectTimeout: const Duration(seconds: 15),
-    receiveTimeout: const Duration(seconds: 15),
-  ));
+    receiveTimeout: const Duration(seconds: 20),
+    responseType: ResponseType.json,
+  );
 
-  // Interceptor: add api_key query and bearer if token exists
+  final dio = Dio(options);
+
+  // Interceptor for API key and token
   dio.interceptors.add(InterceptorsWrapper(
     onRequest: (options, handler) async {
-      // Add api_key as query parameter if not already present
-      options.queryParameters ??= {};
-      if (!options.queryParameters.containsKey('api_key')) {
-        options.queryParameters['api_key'] = cfg.apiKey;
-      }
+      try {
+        // Add api_key query param
+        final qp = Map<String, dynamic>.from(options.queryParameters ?? {});
+        if (!qp.containsKey('api_key')) {
+          qp['api_key'] = cfg.apiKey;
+          options.queryParameters = qp;
+        }
 
-      // Attach bearer token if saved
-      final token = await storage.read(key: 'hisend_token');
-      if (token != null && token.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer $token';
+        // Attach bearer token if present
+        final token = await secureStorage.read(key: 'hisend_token');
+        if (token != null && token.isNotEmpty) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+      } catch (_) {
+        // continue on error
       }
-      handler.next(options);
+      return handler.next(options);
     },
-    onError: (e, handler) => handler.next(e),
+    onError: (err, handler) {
+      return handler.next(err);
+    },
   ));
+
+  // Add logging
+  dio.interceptors.add(
+    LogInterceptor(
+      requestHeader: false,
+      requestBody: true,
+      responseBody: true,
+      responseHeader: false,
+      error: true,
+      logPrint: (obj) {
+        print('[DIO] $obj');
+      },
+    ),
+  );
 
   return dio;
 });

@@ -4,6 +4,7 @@ import '../../models/case_model.dart';
 import '../../stores/case_store.dart';
 
 class CaseDetailPage extends ConsumerStatefulWidget {
+  static const routeName = '/case-detail';
   final String caseId;
   const CaseDetailPage({required this.caseId, super.key});
   @override

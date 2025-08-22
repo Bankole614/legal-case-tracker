@@ -113,7 +113,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   GradientButton(
                     text: _currentIndex == _pages.length - 1 ? 'Get Started' : 'Next',
                     onPressed: _onNext,
-                    gradient: [AppColors.primary, AppColors.accent],
                   ),
                 ],
               ),

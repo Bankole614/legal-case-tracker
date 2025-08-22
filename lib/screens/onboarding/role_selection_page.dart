@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/constants/colors.dart';
 import '../../shared/widgets/gradient_button.dart';
 import '../../providers/app_providers.dart';
-import 'language_selection_page.dart';
 import '../auth/signup_page.dart';
 
 class _Option {
@@ -95,7 +94,6 @@ class RoleSelectionPage extends ConsumerWidget {
                     SignupPage.routeName,
                   );
                 },
-                gradient: [AppColors.primary, AppColors.accent],
                 height: 50,
               )
                   : Container(

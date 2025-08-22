@@ -1,3 +1,4 @@
+import 'package:case_tracker/screens/onboarding/role_selection_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/widgets/auth_widgets.dart';
@@ -79,7 +80,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               ),
               const SizedBox(height: 12),
               TextButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignupPage())),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RoleSelectionPage())),
                   child: const Text("Don't have account? Sign up")
               )
             ],
